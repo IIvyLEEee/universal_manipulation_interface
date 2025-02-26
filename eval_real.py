@@ -170,8 +170,7 @@ def main(input, output, robot_config,
 
     print("steps_per_inference:", steps_per_inference)
     with SharedMemoryManager() as shm_manager:
-        with Spacemouse(shm_manager=shm_manager) as sm, \
-            KeystrokeCounter() as key_counter, \
+        with KeystrokeCounter() as key_counter, \
             BimanualUmiEnv(
                 output_dir=output,
                 robots_config=robots_config,
@@ -382,33 +381,33 @@ def main(input, output, robot_config,
                         break
 
                     precise_wait(t_sample)
-                    # get teleop command
-                    sm_state = sm.get_motion_state_transformed()
-                    # print(sm_state)
-                    dpos = sm_state[:3] * (0.5 / frequency)
-                    drot_xyz = sm_state[3:] * (1.5 / frequency)
+                    # # get teleop command
+                    # sm_state = sm.get_motion_state_transformed()
+                    # # print(sm_state)
+                    # dpos = sm_state[:3] * (0.5 / frequency)
+                    # drot_xyz = sm_state[3:] * (1.5 / frequency)
 
-                    drot = st.Rotation.from_euler('xyz', drot_xyz)
-                    for robot_idx in control_robot_idx_list:
-                        target_pose[robot_idx, :3] += dpos
-                        target_pose[robot_idx, 3:] = (drot * st.Rotation.from_rotvec(
-                            target_pose[robot_idx, 3:])).as_rotvec()
+                    # drot = st.Rotation.from_euler('xyz', drot_xyz)
+                    # for robot_idx in control_robot_idx_list:
+                    #     target_pose[robot_idx, :3] += dpos
+                    #     target_pose[robot_idx, 3:] = (drot * st.Rotation.from_rotvec(
+                    #         target_pose[robot_idx, 3:])).as_rotvec()
 
-                    dpos = 0
-                    if sm.is_button_pressed(0):
-                        # close gripper
-                        dpos = -gripper_speed / frequency
-                    if sm.is_button_pressed(1):
-                        dpos = gripper_speed / frequency
-                    for robot_idx in control_robot_idx_list:
-                        gripper_target_pos[robot_idx] = np.clip(gripper_target_pos[robot_idx] + dpos, 0, max_gripper_width)
+                    # dpos = 0
+                    # if sm.is_button_pressed(0):
+                    #     # close gripper
+                    #     dpos = -gripper_speed / frequency
+                    # if sm.is_button_pressed(1):
+                    #     dpos = gripper_speed / frequency
+                    # for robot_idx in control_robot_idx_list:
+                    #     gripper_target_pos[robot_idx] = np.clip(gripper_target_pos[robot_idx] + dpos, 0, max_gripper_width)
 
-                    # solve collision with table
-                    for robot_idx in control_robot_idx_list:
-                        solve_table_collision(
-                            ee_pose=target_pose[robot_idx],
-                            gripper_width=gripper_target_pos[robot_idx],
-                            height_threshold=robots_config[robot_idx]['height_threshold'])
+                    # # solve collision with table
+                    # for robot_idx in control_robot_idx_list:
+                    #     solve_table_collision(
+                    #         ee_pose=target_pose[robot_idx],
+                    #         gripper_width=gripper_target_pos[robot_idx],
+                    #         height_threshold=robots_config[robot_idx]['height_threshold'])
                     
                     # solve collison between two robots
                     solve_sphere_collision(
