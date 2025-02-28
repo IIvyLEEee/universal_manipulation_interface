@@ -114,7 +114,7 @@ class WSGBinaryDriver:
 
     def start(self):
         self.tcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.tcp_sock.connect((self.hostname, self.port))
+        #self.tcp_sock.connect((self.hostname, self.port))
         # self.ack_fast_stop()
     
     def stop(self):
@@ -139,84 +139,87 @@ class WSGBinaryDriver:
         msg_b = preamble_b + cmd_b + size_b + payload
         checksum_b = checksum_update_crc16(msg_b).to_bytes(2, 'little')
         msg_b += checksum_b
-        return self.tcp_sock.send(msg_b)
+        # return self.tcp_sock.send(msg_b)
+        return '123456789'
 
     def msg_receive(self) -> dict:
-        # syncing
-        sync = 0
-        while sync != 3:
-            res = self.tcp_sock.recv(1)
-            if res == 0xAA.to_bytes(1, 'little'):
-                sync += 1
+        # # syncing
+        # sync = 0
+        # while sync != 3:
+            # res = self.tcp_sock.recv(1)
+            # if res == 0xAA.to_bytes(1, 'little'):
+                # sync += 1
         
-        # read header
-        cmd_id_b = self.tcp_sock.recv(1)
-        cmd_id = int.from_bytes(cmd_id_b, 'little')
+        # # read header
+        # cmd_id_b = self.tcp_sock.recv(1)
+        # cmd_id = int.from_bytes(cmd_id_b, 'little')
 
-        # read size
-        size_b = self.tcp_sock.recv(2)
-        size = int.from_bytes(size_b, 'little')
+        # # read size
+        # size_b = self.tcp_sock.recv(2)
+        # size = int.from_bytes(size_b, 'little')
         
-        # read payload
-        payload_b = self.tcp_sock.recv(size)
-        status_code = int.from_bytes(payload_b[:2], 'little')
+        # # read payload
+        # payload_b = self.tcp_sock.recv(size)
+        # status_code = int.from_bytes(payload_b[:2], 'little')
 
-        parameters_b = payload_b[2:]
+        # parameters_b = payload_b[2:]
 
-        # read checksum
-        checksum_b = self.tcp_sock.recv(2)
+        # # read checksum
+        # checksum_b = self.tcp_sock.recv(2)
         
-        # correct checksum ends in zero
-        header_checksum = 0x50f5
-        msg_checksum = checksum_update_crc16(
-            cmd_id_b + size_b + payload_b + checksum_b, crc=header_checksum)
-        if msg_checksum != 0:
-            raise RuntimeError('Corrupted packet received from WSG')
+        # # correct checksum ends in zero
+        # header_checksum = 0x50f5
+        # msg_checksum = checksum_update_crc16(
+            # cmd_id_b + size_b + payload_b + checksum_b, crc=header_checksum)
+        # if msg_checksum != 0:
+            # raise RuntimeError('Corrupted packet received from WSG')
         
-        result = {
-            'command_id': cmd_id,
-            'status_code': status_code,
-            'payload_bytes': parameters_b
-        }
-        return result
+        # result = {
+            # 'command_id': cmd_id,
+            # 'status_code': status_code,
+            # 'payload_bytes': parameters_b
+        # }
+        # return result
+        return '123456789'
     
     def cmd_submit(self, cmd_id: int, payload: bytes=b'', pending: bool=True, ignore_other=False):
-        res = self.msg_send(cmd_id, payload)
-        if res < 0:
-            raise RuntimeError("Message send failed.")
+        # res = self.msg_send(cmd_id, payload)
+        # if res < 0:
+            # raise RuntimeError("Message send failed.")
 
         # receive response, repeat if pending
-        msg = None
-        keep_running = True
-        while keep_running:
-            msg = self.msg_receive()
-            if ignore_other and msg['command_id'] != cmd_id:
-                continue
+        # msg = None
+        # keep_running = True
+        # while keep_running:
+            # msg = self.msg_receive()
+            # if ignore_other and msg['command_id'] != cmd_id:
+                # continue
 
-            if msg['command_id'] != cmd_id:
-                raise RuntimeError(
-                    "Response ID ({:02X}) does not match submitted command ID ({:02X})\n".format(
-                    msg['command_id'], cmd_id))
-            if pending:
-                status = msg['status_code']
-            keep_running = pending and status == StatusCode.E_CMD_PENDING.value
-        return msg
+            # if msg['command_id'] != cmd_id:
+                # raise RuntimeError(
+                    # "Response ID ({:02X}) does not match submitted command ID ({:02X})\n".format(
+                    # msg['command_id'], cmd_id))
+            # if pending:
+                # status = msg['status_code']
+            # keep_running = pending and status == StatusCode.E_CMD_PENDING.value
+        # return msg
+        return '123456789'
 
     # ============== mid level API ================
 
     def act(self, cmd: CommandId, *args, wait=True, ignore_other=False):
-        msg = self.cmd_submit(
-            cmd_id=cmd.value,
-            payload=args_to_bytes(*args),
-            pending=wait,
-            ignore_other=ignore_other)
-        msg['command_id'] = CommandId(msg['command_id'])
-        msg['status_code'] = StatusCode(msg['status_code'])
+        # msg = self.cmd_submit(
+            # cmd_id=cmd.value,
+            # payload=args_to_bytes(*args),
+            # pending=wait,
+            # ignore_other=ignore_other)
+        # msg['command_id'] = CommandId(msg['command_id'])
+        # msg['status_code'] = StatusCode(msg['status_code'])
 
-        status = msg['status_code']
-        if status != StatusCode.E_SUCCESS:
-            raise RuntimeError(f'Command {cmd} not successful: {status}')
-        return msg
+        # status = msg['status_code']
+        # if status != StatusCode.E_SUCCESS:
+            # raise RuntimeError(f'Command {cmd} not successful: {status}')
+        return '123456789'
 
     # =============== high level API ===============
 
@@ -266,7 +269,8 @@ class WSGBinaryDriver:
 
         # send message
         msg = self.cmd_submit(cmd_id=cmd_id, payload=payload, pending=False)
-        status = StatusCode(msg['status_code'])
+        # status = StatusCode(msg['status_code'])
+        status = StatusCode(msg[0])
         response_payload = msg['payload_bytes']
         if status == StatusCode.E_CMD_UNKNOWN:
             raise RuntimeError('Command unknown - make sure script (cmd_measure.lua) is running')
