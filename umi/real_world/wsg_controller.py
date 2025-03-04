@@ -153,9 +153,9 @@ class WSGController(mp.Process):
                 wsg.homing(positive_direction=self.home_to_open, wait=True)
 
                 # get initial
-                curr_info = wsg.script_query()
-                curr_pos = curr_info['position']
-                # curr_pos = 100.0
+                # curr_info = wsg.script_query()
+                # curr_pos = curr_info['position']
+                curr_pos = 100.0
                 curr_t = time.monotonic()
                 last_waypoint_time = curr_t
                 pose_interp = PoseTrajectoryInterpolator(
@@ -179,14 +179,24 @@ class WSGController(mp.Process):
                     # time.sleep(1e-3)
 
                     # get state from robot
+                    # state = {
+                    #     'gripper_state': info['state'],
+                    #     'gripper_position': info['position'] / self.scale,
+                    #     'gripper_velocity': info['velocity'] / self.scale,
+                    #     'gripper_force': info['force_motor'],
+                    #     'gripper_measure_timestamp': info['measure_timestamp'],
+                    #     'gripper_receive_timestamp': time.time(),
+                    #     'gripper_timestamp': time.time() - self.receive_latency
+                    # }
+
                     state = {
-                        'gripper_state': info['state'],
-                        'gripper_position': info['position'] / self.scale,
-                        'gripper_velocity': info['velocity'] / self.scale,
-                        'gripper_force': info['force_motor'],
-                        'gripper_measure_timestamp': info['measure_timestamp'],
+                        'gripper_state': 0,
+                        'gripper_position': 100.0,
+                        'gripper_velocity': 0.0,
+                        'gripper_force': 0.0,
+                        'gripper_measure_timestamp': time.time(),
                         'gripper_receive_timestamp': time.time(),
-                        'gripper_timestamp': time.time() - self.receive_latency
+                        'gripper_timestamp': time.time()
                     }
                     self.ring_buffer.put(state)
 

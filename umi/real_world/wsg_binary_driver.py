@@ -269,9 +269,10 @@ class WSGBinaryDriver:
 
         # send message
         msg = self.cmd_submit(cmd_id=cmd_id, payload=payload, pending=False)
-        # status = StatusCode(msg['status_code'])
-        status = StatusCode(msg[0])
+        status = StatusCode(msg['status_code'])
+        # status = StatusCode(msg[0])
         response_payload = msg['payload_bytes']
+        response_payload = msg[0]
         if status == StatusCode.E_CMD_UNKNOWN:
             raise RuntimeError('Command unknown - make sure script (cmd_measure.lua) is running')
         if status != StatusCode.E_SUCCESS:
@@ -284,26 +285,27 @@ class WSGBinaryDriver:
         # parse payload
         state = response_payload[0]
         values = list()
+        # values = '1234'
         for i in range(4):
             start = i * 4 + 1
             end = start + 4
             values.append(struct.unpack('<f', response_payload[start:end])[0])
 
-        info = {
-            'state': state,
-            'position': values[0],
-            'velocity': values[1],
-            'force_motor': values[2],
-            'measure_timestamp': values[3],
-            'is_moving': (state & 0x02) != 0
-        }
         # info = {
-        #     'state': 0,
-        #     'position': 100.,
-        #     'velocity': 0.,
-        #     'force_motor': 0.,
-        #     'is_moving': 0.
+        #     'state': state,
+        #     'position': values[0],
+        #     'velocity': values[1],
+        #     'force_motor': values[2],
+        #     'measure_timestamp': values[3],
+        #     'is_moving': (state & 0x02) != 0
         # }
+        info = {
+            'state': 0,
+            'position': 100.,
+            'velocity': 0.,
+            'force_motor': 0.,
+            'is_moving': 0.
+        }
         return info
 
     def script_query(self):
