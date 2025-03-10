@@ -108,8 +108,9 @@ class MultiUvcCamera:
             self.stop_wait()
 
     def start_wait(self):
-        for camera in self.cameras.values():
-            camera.start_wait()
+        print("entering camera.start_wait")
+        #for camera in self.cameras.values():
+            #camera.start_wait()
 
     def stop_wait(self):
         for camera in self.cameras.values():

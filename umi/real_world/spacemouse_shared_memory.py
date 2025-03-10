@@ -126,35 +126,35 @@ class Spacemouse(mp.Process):
 
     # ========= main loop ==========
     # def run(self):
-    #     spnav_open()
-    #     try:
-    #         motion_event = np.zeros((7,), dtype=np.int64)
-    #         button_state = np.zeros((self.n_buttons,), dtype=bool)
-    #         # send one message immediately so client can start reading
-    #         self.ring_buffer.put({
-    #             'motion_event': motion_event,
-    #             'button_state': button_state,
-    #             'receive_timestamp': time.time()
-    #         })
-    #         self.ready_event.set()
+        # spnav_open()
+        # try:
+            # motion_event = np.zeros((7,), dtype=np.int64)
+            # button_state = np.zeros((self.n_buttons,), dtype=bool)
+            # # send one message immediately so client can start reading
+            # self.ring_buffer.put({
+                # 'motion_event': motion_event,
+                # 'button_state': button_state,
+                # 'receive_timestamp': time.time()
+            # })
+            # self.ready_event.set()
 
-    #         while not self.stop_event.is_set():
-    #             event = spnav_poll_event()
-    #             receive_timestamp = time.time()
-    #             if isinstance(event, SpnavMotionEvent):
-    #                 motion_event[:3] = event.translation
-    #                 motion_event[3:6] = event.rotation
-    #                 motion_event[6] = event.period
-    #             elif isinstance(event, SpnavButtonEvent):
-    #                 button_state[event.bnum] = event.press
-    #             else:
-    #                 # finish integrating this round of events
-    #                 # before sending over
-    #                 self.ring_buffer.put({
-    #                     'motion_event': motion_event,
-    #                     'button_state': button_state,
-    #                     'receive_timestamp': receive_timestamp
-    #                 })
-    #                 time.sleep(1/self.frequency)
-    #     finally:
-    #         spnav_close()
+            # while not self.stop_event.is_set():
+                # event = spnav_poll_event()
+                # receive_timestamp = time.time()
+                # if isinstance(event, SpnavMotionEvent):
+                    # motion_event[:3] = event.translation
+                    # motion_event[3:6] = event.rotation
+                    # motion_event[6] = event.period
+                # elif isinstance(event, SpnavButtonEvent):
+                    # button_state[event.bnum] = event.press
+                # else:
+                    # # finish integrating this round of events
+                    # # before sending over
+                    # self.ring_buffer.put({
+                        # 'motion_event': motion_event,
+                        # 'button_state': button_state,
+                        # 'receive_timestamp': receive_timestamp
+                    # })
+                    # time.sleep(1/self.frequency)
+        # finally:
+            # spnav_close()

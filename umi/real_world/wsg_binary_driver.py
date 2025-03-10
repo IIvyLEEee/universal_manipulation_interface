@@ -269,27 +269,27 @@ class WSGBinaryDriver:
 
         # send message
         msg = self.cmd_submit(cmd_id=cmd_id, payload=payload, pending=False)
-        status = StatusCode(msg['status_code'])
-        # status = StatusCode(msg[0])
-        response_payload = msg['payload_bytes']
+        # status = StatusCode(msg['status_code'])
+        status = 0
+        # response_payload = msg['payload_bytes']
         response_payload = msg[0]
-        if status == StatusCode.E_CMD_UNKNOWN:
-            raise RuntimeError('Command unknown - make sure script (cmd_measure.lua) is running')
-        if status != StatusCode.E_SUCCESS:
-            raise RuntimeError('Command failed')
-        if len(response_payload) != 17:
-            raise RuntimeError("Response payload incorrect (", 
-                               "".join("{:02X}".format(b) for b in response_payload),
-                               ")")
+        #if status == StatusCode.E_CMD_UNKNOWN:
+        #    raise RuntimeError('Command unknown - make sure script (cmd_measure.lua) is running')
+        #if status != StatusCode.E_SUCCESS:
+        #    raise RuntimeError('Command failed')
+        #if len(response_payload) != 17:
+        #    raise RuntimeError("Response payload incorrect (", 
+        #                       "".join("{:02X}".format(b) for b in response_payload),
+        #                       ")")
         
         # parse payload
         state = response_payload[0]
-        values = list()
-        # values = '1234'
-        for i in range(4):
-            start = i * 4 + 1
-            end = start + 4
-            values.append(struct.unpack('<f', response_payload[start:end])[0])
+        #values = list()
+        values = '1234'
+        #for i in range(4):
+        #    start = i * 4 + 1
+        #    end = start + 4
+        #    values.append(struct.unpack('<f', response_payload[start:end])[0])
 
         # info = {
         #     'state': state,

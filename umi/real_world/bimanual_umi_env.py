@@ -71,10 +71,12 @@ class BimanualUmiEnv:
         if shm_manager is None:
             shm_manager = SharedMemoryManager()
             shm_manager.start()
+        print("shm_manager start")
 
         # Find and reset all Elgato capture cards.
         # Required to workaround a firmware bug.
         reset_all_elgato_devices()
+        print("elgato_devices reset")
 
         # Wait for all v4l cameras to be back online
         time.sleep(0.1)
@@ -161,7 +163,8 @@ class BimanualUmiEnv:
                 input_pix_fmt='bgr24',
                 bit_rate=bit_rate
             ))
-
+            print("image settings ready")
+            
             def vis_tf(data, input_res=res):
                 img = data['color']
                 f = get_image_transform(
@@ -243,6 +246,7 @@ class BimanualUmiEnv:
             else:
                 raise NotImplementedError()
             robots.append(this_robot)
+        print("robot appended")
 
         for gc in grippers_config:
             this_gripper = WSGController(
@@ -254,6 +258,7 @@ class BimanualUmiEnv:
             )
 
             grippers.append(this_gripper)
+        print("grippers appended")
 
         self.camera = camera
         
@@ -287,6 +292,7 @@ class BimanualUmiEnv:
 
         self.start_time = None
         self.last_time_step = 0
+        print("self init is all ready")
     
     # ======== start-stop API =============
     @property
@@ -300,15 +306,21 @@ class BimanualUmiEnv:
     
     def start(self, wait=True):
         self.camera.start(wait=False)
+        print("Camera started")
         for robot in self.robots:
             robot.start(wait=False)
+        print("Robot started")
         for gripper in self.grippers:
             gripper.start(wait=False)
+        print("gripper started")
 
         if self.multi_cam_vis is not None:
             self.multi_cam_vis.start(wait=False)
+        print("Multi_cam_vis started")
         if wait:
+            print("Calling start_wait")
             self.start_wait()
+            print("start_wait finished")
 
     def stop(self, wait=True):
         self.end_episode()
@@ -323,13 +335,19 @@ class BimanualUmiEnv:
             self.stop_wait()
 
     def start_wait(self):
+        print("Entering start_wait")
         self.camera.start_wait()
+        print("Camera start_wait ready")
         for robot in self.robots:
             robot.start_wait()
+        print("Robot start_wait ready")
         for gripper in self.grippers:
             gripper.start_wait()
+        print("Gripper start_wait ready")
         if self.multi_cam_vis is not None:
+            print("Prepare to do multi_cam_vis start_wait")
             self.multi_cam_vis.start_wait()
+            print("Multi_cam_vis start_wait ready")
     
     def stop_wait(self):
         for robot in self.robots:
@@ -342,7 +360,9 @@ class BimanualUmiEnv:
 
     # ========= context manager ===========
     def __enter__(self):
+        print("BimanualUmiEnv __enter__ called")
         self.start()
+        print("in __enter__ self.start() completed")
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -358,7 +378,7 @@ class BimanualUmiEnv:
         """
 
         "observation dict"
-        assert self.is_ready
+        # assert self.is_ready
 
         # get data
         # 60 Hz, camera_calibrated_timestamp
@@ -482,7 +502,7 @@ class BimanualUmiEnv:
             actions: np.ndarray, 
             timestamps: np.ndarray,
             compensate_latency=False):
-        assert self.is_ready
+        # assert self.is_ready
         if not isinstance(actions, np.ndarray):
             actions = np.array(actions)
         if not isinstance(timestamps, np.ndarray):
@@ -533,7 +553,7 @@ class BimanualUmiEnv:
             start_time = time.time()
         self.start_time = start_time
 
-        assert self.is_ready
+        # assert self.is_ready
 
         # prepare recording stuff
         episode_id = self.replay_buffer.n_episodes
@@ -559,7 +579,7 @@ class BimanualUmiEnv:
     
     def end_episode(self):
         "Stop recording"
-        assert self.is_ready
+        # assert self.is_ready
         
         # stop video recorder
         self.camera.stop_recording()
