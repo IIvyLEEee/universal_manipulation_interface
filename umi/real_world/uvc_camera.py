@@ -124,7 +124,7 @@ class UvcCamera(mp.Process):
 
         # shared variables
         self.stop_event = mp.Event()
-        self.ready_event = mp.Event()
+        self.ready_event =  mp.Event()
         self.ring_buffer = ring_buffer
         self.vis_ring_buffer = vis_ring_buffer
         self.command_queue = command_queue
@@ -157,7 +157,9 @@ class UvcCamera(mp.Process):
             self.end_wait()
 
     def start_wait(self):
+        print(0)
         self.ready_event.wait()
+        print(1)
         self.video_recorder.start_wait()
     
     def end_wait(self):
@@ -206,8 +208,10 @@ class UvcCamera(mp.Process):
 
         # open VideoCapture
         cap = cv2.VideoCapture(self.dev_video_path, cv2.CAP_V4L2)
+        #cap = cv2.VideoCapture("/dev/video4", cv2.CAP_V4L2)
         
         try:
+            # print("run: 1")
             # set resolution and fps
             w, h = self.resolution
             fps = self.capture_fps
@@ -227,23 +231,30 @@ class UvcCamera(mp.Process):
             iter_idx = 0
             t_start = time.time()
             while not self.stop_event.is_set():
+                # print("run: 2")
                 ts = time.time()
                 ret = cap.grab()
                 assert ret
-                
+                # print("run: 3")
                 # directly write into shared memory to avoid copy
                 frame = self.video_recorder.get_img_buffer()
+                #print(type(frame))
+                #print(frame)
                 ret, frame = cap.retrieve(frame)
+                #print(self.video_recorder.cmd_queue.get_all())
+                # print("pass")
                 t_recv = time.time()
                 assert ret
+                # print("run: 4")
                 mt_cap = cap.get(cv2.CAP_PROP_POS_MSEC) / 1000
                 t_cap = mt_cap - time.monotonic() + time.time()
                 t_cal = t_recv - self.receive_latency # calibrated latency
-                     
+                # print("run: 5")
                 # record frame
                 if self.video_recorder.is_ready():
                     self.video_recorder.write_img_buffer(frame, frame_time=t_cal)
 
+                # print("run: 6")
                 data = dict()
                 data['camera_receive_timestamp'] = t_recv
                 data['camera_capture_timestamp'] = t_cap
@@ -251,8 +262,11 @@ class UvcCamera(mp.Process):
                 
                 # apply transform
                 put_data = data
+                #print(data)
+                #print(f"put data 1 {put_data}")
                 if self.transform is not None:
                     put_data = self.transform(dict(data))
+                    #print(f"put data 2 {put_data}")
 
                 if self.put_downsample:                
                     # put frequency regulation
@@ -280,6 +294,7 @@ class UvcCamera(mp.Process):
                     self.ring_buffer.put(put_data, wait=False)
 
                 # signal ready
+                # print("ready")
                 if iter_idx == 0:
                     self.ready_event.set()
                     

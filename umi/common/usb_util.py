@@ -83,5 +83,8 @@ def get_sorted_v4l_paths(by_id=True):
             valid_paths.append(dev_path)
 
     result = [str(x.absolute()) for x in valid_paths]
+    
+    print("in get_sorted_v4l_paths, result:")
+    print(result)
 
     return result

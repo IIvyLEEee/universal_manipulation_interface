@@ -7,7 +7,7 @@ import math
 from multiprocessing.managers import SharedMemoryManager
 from umi.real_world.rtde_interpolation_controller import RTDEInterpolationController
 from umi.real_world.wsg_controller import WSGController
-# from umi.real_world.franka_interpolation_controller import FrankaInterpolationController
+#from umi.real_world.franka_interpolation_controller import FrankaInterpolationController
 from umi.real_world.multi_uvc_camera import MultiUvcCamera, VideoRecorder
 from diffusion_policy.common.timestamp_accumulator import (
     TimestampActionAccumulator,
@@ -81,6 +81,7 @@ class BimanualUmiEnv:
         # Wait for all v4l cameras to be back online
         time.sleep(0.1)
         v4l_paths = get_sorted_v4l_paths()
+        #v4l_paths = ['/dev/video3']
         if camera_reorder is not None:
             paths = [v4l_paths[i] for i in camera_reorder]
             v4l_paths = paths
@@ -136,12 +137,18 @@ class BimanualUmiEnv:
                 def tf(data, input_res=res):
                     img = data['color']
                     if fisheye_converter is None:
+                        # print(input_res)
+                        
                         f = get_image_transform(
                             input_res=input_res,
                             output_res=obs_image_resolution, 
                             # obs output rgb
                             bgr_to_rgb=True)
+                        # print("before")
+                        # print(img.shape)
                         img = np.ascontiguousarray(f(img))
+                        # print("after")
+                        # print(img.shape)
                         if is_mirror is not None:
                             img[is_mirror] = img[:,::-1,:][is_mirror]
                         img = draw_predefined_mask(img, color=(0,0,0), 
@@ -378,7 +385,7 @@ class BimanualUmiEnv:
         """
 
         "observation dict"
-        # assert self.is_ready
+        assert self.is_ready
 
         # get data
         # 60 Hz, camera_calibrated_timestamp
@@ -502,7 +509,7 @@ class BimanualUmiEnv:
             actions: np.ndarray, 
             timestamps: np.ndarray,
             compensate_latency=False):
-        # assert self.is_ready
+        assert self.is_ready
         if not isinstance(actions, np.ndarray):
             actions = np.array(actions)
         if not isinstance(timestamps, np.ndarray):
@@ -553,7 +560,7 @@ class BimanualUmiEnv:
             start_time = time.time()
         self.start_time = start_time
 
-        # assert self.is_ready
+        assert self.is_ready
 
         # prepare recording stuff
         episode_id = self.replay_buffer.n_episodes
@@ -579,7 +586,7 @@ class BimanualUmiEnv:
     
     def end_episode(self):
         "Stop recording"
-        # assert self.is_ready
+        assert self.is_ready
         
         # stop video recorder
         self.camera.stop_recording()

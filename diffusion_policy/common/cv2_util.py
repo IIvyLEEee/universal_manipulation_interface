@@ -86,6 +86,9 @@ def get_image_transform(
         output_res: Tuple[int,int]=(640,480), 
         bgr_to_rgb: bool=False):
 
+    # print(f"target input_res: {input_res}")
+    # print(f"target output_res: {output_res}")
+
     iw, ih = input_res
     ow, oh = output_res
     rw, rh = None, None
@@ -112,11 +115,15 @@ def get_image_transform(
         c_slice = slice(None, None, -1)
 
     def transform(img: np.ndarray):
+        # print(f"{img.shape}before assert")
         assert img.shape == ((ih,iw,3))
+        #assert img.shape == ((576, 720, 3)) or img.shape == ((1080, 1920, 3))
+        #assert img.shape == ((576, 720, 3))
         # resize
         img = cv2.resize(img, (rw, rh), interpolation=interp_method)
         # crop
         img = img[h_slice, w_slice, c_slice]
+        # print(f"{img.shape}after transform")
         return img
     return transform
 

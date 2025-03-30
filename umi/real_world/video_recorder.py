@@ -112,8 +112,8 @@ class VideoRecorder(mp.Process):
         self.cmd_queue = SharedMemoryQueue.create_from_examples(
             shm_manager=shm_manager,
             examples={
-                'cmd': self.Command.START_RECORDING.value,
-                'video_path': np.array('a'*self.MAX_PATH_LENGTH)
+                'cmd':self.Command.START_RECORDING.value,
+                'video_path':np.array('a'*self.MAX_PATH_LENGTH)
             },
             buffer_size=self.buffer_size
         )
@@ -126,6 +126,7 @@ class VideoRecorder(mp.Process):
 
     def start_wait(self):
         self.ready_event.wait()
+        print(2)
     
     def end_wait(self):
         self.join()
@@ -220,12 +221,15 @@ class VideoRecorder(mp.Process):
             video_path = None
             # ========= stopped state ============
             while (video_path is None) and (not self.stop_event.is_set()):
+                #print(f"video_path: {video_path}")
+                #print(f"video_path: {self.stop_event.is_set()}")
                 try:
                     commands = self.cmd_queue.get_all()
                     for i in range(len(commands['cmd'])):
                         cmd = commands['cmd'][i]
                         if cmd == self.Command.START_RECORDING.value:
                             video_path = str(commands['video_path'][i])
+                            print("[Start recording!]")
                         elif cmd == self.Command.STOP_RECORDING.value:
                             video_path = None
                         else:
