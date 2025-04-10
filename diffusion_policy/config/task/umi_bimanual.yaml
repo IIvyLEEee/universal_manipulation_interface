@@ -11,8 +11,7 @@ img_obs_horizon: 2
 action_horizon: 16
 ignore_proprioception: False
 
-shape_meta: &shape_meta
-  # acceptable types: rgb, low_dim
+shape_meta: &shape_meta # acceptable types: rgb, low_dim
   obs:
     camera0_rgb:
       shape: [3, 224, 224]
@@ -106,7 +105,7 @@ shape_meta: &shape_meta
       type: low_dim
       ignore_by_policy: ${task.ignore_proprioception}
 
-  action: 
+  action:
     shape: [20]
     horizon: ${task.action_horizon}
     latency_steps: 0 # float
@@ -114,7 +113,8 @@ shape_meta: &shape_meta
     rotation_rep: rotation_6d
 
 task_name: &task_name umi
-dataset_path: &dataset_path data_workspace/fold_cloth/20231226_mirror_swap.zarr.zip
+# dataset_path: &dataset_path data_workspace/fold_cloth/20231226_mirror_swap.zarr.zip
+dataset_path: &dataset_path data_workspace/cup_in_the_wild.zarr.zip
 pose_repr: &pose_repr
   obs_pose_repr: relative # abs or rel
   action_pose_repr: relative # abs or rel or delta

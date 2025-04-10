@@ -10,7 +10,8 @@ shape_meta: ${task.shape_meta}
 exp_name: "default"
 
 n_action_steps: 8
-n_emb: 768
+# n_emb: 768
+n_emb: 512
 
 policy:
   _target_: diffusion_policy.policy.diffusion_transformer_timm_policy.DiffusionTransformerTimmPolicy
@@ -91,8 +92,10 @@ policy:
 
   num_inference_steps: 16
   input_pertub: 0.1 # reference: https://github.com/forever208/DDPM-IP
-  n_layer: 7
-  n_head: 8
+  # n_layer: 7
+  n_layer: 8
+  # n_head: 8
+  n_head: 4
   n_emb: ${n_emb}
   p_drop_attn: 0.1
 
