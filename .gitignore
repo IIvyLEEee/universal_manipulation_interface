@@ -4,6 +4,7 @@ data
 data_local
 data_workspace
 outputs
+vit_model
 wandb
 **/.DS_Store
 *.lprof
