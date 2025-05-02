@@ -85,8 +85,8 @@ class TimmObsEncoder(ModuleAttrMixin):
         assert global_pool == ''
         model = timm.create_model(
             model_name=model_name,
-            # pretrained=pretrained,
-            pretrained=False, # we will load the weights manually
+            pretrained=pretrained,
+            # pretrained=False,
             global_pool=global_pool, # '' means no pooling
             num_classes=0            # remove classification layer
         )
